@@ -4,6 +4,7 @@ import (
 	"context"
 	_ "embed"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 	"strings"
@@ -41,12 +42,14 @@ func NewWebFetchTool(workingDir string, client *http.Client) fantasy.AgentTool {
 			var content string
 			if webCLIAvailable() {
 				if webContent := tryWebFetch(ctx, params.URL); webContent != "" {
+					slog.Info("Using web CLI for fetch", "url", params.URL)
 					content = webContent
 				}
 			}
 
 			// Fall back to native implementation
 			if content == "" {
+				slog.Info("Using native HTTP for fetch", "url", params.URL)
 				var err error
 				content, err = FetchURLAndConvert(ctx, client, params.URL)
 				if err != nil {

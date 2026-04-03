@@ -47,12 +47,14 @@ func NewWebSearchTool(client *http.Client) fantasy.AgentTool {
 			var result string
 			if webCLIAvailable() {
 				if webResult := tryWebSearch(ctx, params.Query); webResult != "" {
+					slog.Info("Using web CLI for search", "query", params.Query)
 					result = webResult
 				}
 			}
 
 			// Fall back to native implementation
 			if result == "" {
+				slog.Info("Using native HTTP for search", "query", params.Query)
 				maybeDelaySearch()
 				results, err := searchDuckDuckGo(ctx, client, params.Query, maxResults)
 				slog.Debug("Web search completed", "query", params.Query, "results", len(results), "err", err)
@@ -61,7 +63,7 @@ func NewWebSearchTool(client *http.Client) fantasy.AgentTool {
 				}
 				result = formatSearchResults(results)
 			} else {
-				slog.Debug("Web search completed via web CLI", "query", params.Query)
+				slog.Info("Web search completed via web CLI", "query", params.Query)
 			}
 
 			return fantasy.NewTextResponse(result), nil
