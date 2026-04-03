@@ -37,9 +37,21 @@ func NewWebFetchTool(workingDir string, client *http.Client) fantasy.AgentTool {
 				return fantasy.NewTextErrorResponse("url is required"), nil
 			}
 
-			content, err := FetchURLAndConvert(ctx, client, params.URL)
-			if err != nil {
-				return fantasy.NewTextErrorResponse(fmt.Sprintf("Failed to fetch URL: %s", err)), nil
+			// Try web CLI first, fall back to native implementation
+			var content string
+			if webCLIAvailable() {
+				if webContent := tryWebFetch(ctx, params.URL); webContent != "" {
+					content = webContent
+				}
+			}
+
+			// Fall back to native implementation
+			if content == "" {
+				var err error
+				content, err = FetchURLAndConvert(ctx, client, params.URL)
+				if err != nil {
+					return fantasy.NewTextErrorResponse(fmt.Sprintf("Failed to fetch URL: %s", err)), nil
+				}
 			}
 
 			hasLargeContent := len(content) > LargeContentThreshold
