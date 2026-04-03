@@ -40,7 +40,7 @@ func tryWebSearch(ctx context.Context, query string) string {
 		return ""
 	}
 
-cmd := exec.CommandContext(ctx, path, "search", query)
+	cmd := exec.CommandContext(ctx, path, "search", query)
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
@@ -65,7 +65,7 @@ func tryWebFetch(ctx context.Context, url string) string {
 		return ""
 	}
 
-cmd := exec.CommandContext(ctx, path, "fetch", url)
+	cmd := exec.CommandContext(ctx, path, "fetch", url)
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
